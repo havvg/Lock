@@ -1,0 +1,18 @@
+{
+    "name": "havvg/lock",
+    "description": "A component for simple resource locking.",
+    "keywords": [ "lock", "locking" ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Toni Uebernickel",
+            "email": "tuebernickel@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-0": {
+            "Havvg\\Component\\Lock": ""
+        }
+    },
+    "target-dir": "Havvg/Component/Lock"
+}
