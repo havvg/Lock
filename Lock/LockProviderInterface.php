@@ -3,6 +3,7 @@
 namespace Havvg\Component\Lock\Lock;
 
 use Havvg\Component\Lock\Acquirer\AcquirerInterface;
+use Havvg\Component\Lock\Exception\UnsupportedException;
 use Havvg\Component\Lock\Resource\ResourceInterface;
 
 interface LockProviderInterface
@@ -16,6 +17,8 @@ interface LockProviderInterface
      * @param ResourceInterface $resource
      *
      * @return LockInterface
+     *
+     * @throws UnsupportedException
      */
     public function create(AcquirerInterface $acquirer, ResourceInterface $resource);
 }

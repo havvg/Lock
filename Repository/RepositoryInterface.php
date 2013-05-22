@@ -4,6 +4,7 @@ namespace Havvg\Component\Lock\Repository;
 
 use Havvg\Component\Lock\Acquirer\AcquirerInterface;
 use Havvg\Component\Lock\Exception\ResourceLockedException;
+use Havvg\Component\Lock\Exception\UnsupportedException;
 use Havvg\Component\Lock\Lock\LockInterface;
 use Havvg\Component\Lock\Resource\ResourceInterface;
 
@@ -27,6 +28,7 @@ interface RepositoryInterface
      * @return LockInterface
      *
      * @throws ResourceLockedException
+     * @throws UnsupportedException
      */
     public function acquire(AcquirerInterface $acquirer, ResourceInterface $resource);
 
