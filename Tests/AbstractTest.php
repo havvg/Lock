@@ -20,6 +20,14 @@ abstract class AbstractTest extends \PHPUnit_Framework_TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|LockInterface
      */
+    protected function getMockExpiringLock()
+    {
+        return $this->getMock('Havvg\Component\Lock\Lock\ExpiringLockInterface');
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|LockInterface
+     */
     protected function getMockLock()
     {
         return $this->getMock('Havvg\Component\Lock\Lock\LockInterface');

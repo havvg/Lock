@@ -107,6 +107,94 @@ class LockManagerTest extends AbstractTest
             'A locked Resource is not accessible by other Acquirers.');
     }
 
+    public function testResourceWithExpiredLockIsAccessible()
+    {
+        $acquirer = $this->getMockAcquirer();
+
+        $lock = $this->getMockExpiringLock();
+        $lock
+            ->expects($this->once())
+            ->method('getExpiresAt')
+            ->will($this->returnValue(new \DateTime('-1 hour')))
+        ;
+
+        $repository = $this->getMockRepository();
+        $repository
+            ->expects($this->once())
+            ->method('release')
+            ->with($lock)
+        ;
+
+        $resource = $this->getMockResource();
+        $resource
+            ->expects($this->once())
+            ->method('isLocked')
+            ->will($this->returnValue(true))
+        ;
+        $resource
+            ->expects($this->once())
+            ->method('getLock')
+            ->will($this->returnValue($lock))
+        ;
+
+        $manager = new LockManager($repository);
+
+        $this->assertTrue($manager->isAccessible($acquirer, $resource),
+            'A Resource with an expired Lock is accessible.');
+    }
+
+    public function testResourceWithValidExpiringLockIsNotAccessible()
+    {
+        $acquirer = $this->getMockAcquirer();
+        $acquirer
+            ->expects($this->once())
+            ->method('getIdentifier')
+            ->will($this->returnValue('MockAcquirer'))
+        ;
+
+        $requester = $this->getMockAcquirer();
+        $requester
+            ->expects($this->once())
+            ->method('getIdentifier')
+            ->will($this->returnValue('RequestingAcquirer'))
+        ;
+
+        $lock = $this->getMockExpiringLock();
+        $lock
+            ->expects($this->once())
+            ->method('getAcquirer')
+            ->will($this->returnValue($acquirer))
+        ;
+        $lock
+            ->expects($this->once())
+            ->method('getExpiresAt')
+            ->will($this->returnValue(new \DateTime('+1 hour')))
+        ;
+
+        $repository = $this->getMockRepository();
+        $repository
+            ->expects($this->never())
+            ->method('release')
+        ;
+
+        $resource = $this->getMockResource();
+        $resource
+            ->expects($this->once())
+            ->method('isLocked')
+            ->will($this->returnValue(true))
+        ;
+        $resource
+            ->expects($this->once())
+            ->method('getLock')
+            ->will($this->returnValue($lock))
+        ;
+
+        $manager = new LockManager($repository);
+
+        $this->assertFalse($manager->isAccessible($requester, $resource),
+            'A locked Resource is not accessible by other Acquirers.');
+    }
+
     /**
      * @depends testLockedResourceIsAccessibleByAcquirer
      * @depends testLockedResourceIsNotAccessibleByOthers

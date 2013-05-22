@@ -4,6 +4,7 @@ namespace Havvg\Component\Lock;
 
 use Havvg\Component\Lock\Acquirer\AcquirerInterface;
 use Havvg\Component\Lock\Exception\ResourceLockedException;
+use Havvg\Component\Lock\Lock\ExpiringLockInterface;
 use Havvg\Component\Lock\Lock\LockInterface;
 use Havvg\Component\Lock\Repository\RepositoryInterface;
 use Havvg\Component\Lock\Resource\ResourceInterface;
@@ -34,7 +35,28 @@ class LockManager
             return true;
         }
 
-        return $resource->getLock()->getAcquirer()->getIdentifier() === $acquirer->getIdentifier();
+        $lock = $resource->getLock();
+        if ($lock instanceof ExpiringLockInterface and $this->isLockExpired($lock)) {
+            $this->release($lock);
+
+            return true;
+        }
+
+        return $lock->getAcquirer()->getIdentifier() === $acquirer->getIdentifier();
+    }
+
+    /**
+     * Check whether the given Lock is expired and should be ignored.
+     *
+     * @param ExpiringLockInterface $lock
+     *
+     * @return bool
+     */
+    public function isLockExpired(ExpiringLockInterface $lock)
+    {
+        $now = new \DateTime();
+
+        return ($now > $lock->getExpiresAt());
     }
 
     /**
